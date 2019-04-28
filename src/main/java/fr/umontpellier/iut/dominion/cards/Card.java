@@ -87,4 +87,8 @@ public abstract class Card {
     public int getVictoryValue(Player p) {
         return 0;
     }
+
+    public static class Action {
+
+    }
 }
