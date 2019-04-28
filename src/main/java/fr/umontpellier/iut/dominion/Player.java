@@ -67,7 +67,8 @@ public class Player {
      * préparer la main du joueur après avoir placé les cartes dans la défausse.
      */
     public Player(String name, Game game) {
-        throw new RuntimeException("Not Implemented");
+        this.name = name;
+        this.game = game;
     }
 
     /**
@@ -126,7 +127,22 @@ public class Player {
      * défausse, la pioche et en jeu)
      */
     public ListOfCards getAllCards() {
-        throw new RuntimeException("Not Implemented");
+        int i;
+        ArrayList<Card> allCards = new ArrayList<Card>();
+        for(i=0;i<this.hand.size();i++){
+            allCards.add(this.hand.get(i));
+        }
+        for(i=0;i<this.discard.size();i++){
+            allCards.add(this.discard.get(i));
+        }
+        for(i=0;i<this.draw.size();i++){
+            allCards.add(this.draw.get(i));
+        }
+        for(i=0;i<this.inPlay.size();i++){
+            allCards.add(this.inPlay.get(i));
+        }//On récupère toutes les cartes dans chaque positions (main, deck, jeu ou défausse) et on les ajoute a une nouvelle liste
+        ListOfCards allCard = new ListOfCards(allCards);
+        return allCard;
     }
 
     /**
@@ -137,7 +153,12 @@ public class Player {
      * {@code getVictoryValue()}) des cartes
      */
     public int getVictoryPoints() {
-        throw new RuntimeException("Not Implemented");
+        int tot=0;
+        ListOfCards toutesLesCartes= this.getAllCards();
+        for (int i = 0; i <toutesLesCartes.size() ; i++) {
+            tot+=toutesLesCartes.get(i).getVictoryValue(this); //on adittione tot à aux victorypoint de la carte i;
+        }
+        return tot;
     }
 
     /**
@@ -196,7 +217,18 @@ public class Player {
      * @return la carte piochée, {@code null} si aucune carte disponible
      */
     public Card drawCard() {
-        throw new RuntimeException("Not Implemented");
+        Card cartePiochee = null;
+        if(this.draw.isEmpty()){
+            this.discard.shuffle();
+            for(int i = 0;i<this.discard.size();i++){
+                this.draw.add(this.discard.remove(this.discard.get(i).getName()));//On ajoute à la pioche ce qu'on supprime à l'autre en utilisant remove(CardName)
+            }
+        }
+        if(!this.draw.isEmpty()){
+            cartePiochee = this.draw.get(0);
+            this.draw.remove(this.draw.get(0).getName());
+        }
+        return cartePiochee;
     }
 
     /**
@@ -208,7 +240,9 @@ public class Player {
      * @return la carte piochée, {@code null} si aucune carte disponible
      */
     public Card drawToHand() {
-        throw new RuntimeException("Not Implemented");
+        Card cartePioche = drawCard();
+        this.addToHand(cartePioche);
+        return cartePioche;
     }
 
     /**
@@ -284,8 +318,10 @@ public class Player {
      * {@code inPlay} et exécute la méthode {@code play(Player p)} de la carte.
      */
     private void playCard(Card c) {
-        throw new RuntimeException("Not Implemented");
+        this.inPlay.add(this.hand.remove(c.getName()));//on enlève la carte de la main et on la met dans in play
+        c.play(this);//joue l'effet de la carte
     }
+
 
     /**
      * Joue une carte de la main du joueur.
@@ -298,7 +334,9 @@ public class Player {
      * fait rien.
      */
     public void playCard(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        if (hand.getCard(cardName)!=null){//si il y a une carte dans Hand possédant le nom cardName
+            this.playCard(hand.getCard(cardName));//le joueur joue la carte avec ce même nom
+        }
     }
 
     /**
@@ -311,7 +349,9 @@ public class Player {
      * emplacement précédent au préalable.
      */
     public void gain(Card c) {
-        throw new RuntimeException("Not Implemented");
+        if (c!=null){
+            this.discard.add(c);
+        }
     }
 
     /**
@@ -324,7 +364,8 @@ public class Player {
      * null} si aucune carte n'a été prise dans la réserve.
      */
     public Card gainFromSupply(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        this.gain(this.game.getFromSupply(cardName));//ajoute la carte si elle est présente dans la réserve car sinon getFromSupply(cardName)==null
+        return this.game.removeFromSupply(cardName);//return si la carte est présente dans la réserve si oui retourne la carte
     }
 
     /**
@@ -342,14 +383,22 @@ public class Player {
      * lieu
      */
     public Card buyCard(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        Card achat = this.game.getFromSupply(cardName);
+        if(achat != null) {
+            if (achat.getCost() <= this.money && this.numberOfBuys >= 1) {
+                this.money -= achat.getCost();
+                this.numberOfBuys--;
+                return gainFromSupply(cardName);
+            }
+        }
+        return null;
     }
 
     /**
      * Ajoute une carte sur le dessus de la pioche du joueur
      */
     public void addToDraw(Card c) {
-        throw new RuntimeException("Not Implemented");
+        this.draw.add(c);
     }
 
     /**
@@ -521,7 +570,21 @@ public class Player {
      * - Le joueur pioche 5 cartes en main
      */
     public void endTurn() {
-        throw new RuntimeException("Not Implemented");
+        //discard toutes les cartes restantes
+        for (int i = 0; i < hand.size(); i++) {
+            this.discardCard(hand.get(i));
+        }
+        for (int i = 0; i < inPlay.size(); i++) {
+            this.discardCard(inPlay.get(i));
+        }
+        //pioche 5 cartes
+        for (int i = 0; i < 5; i++) {
+            this.drawToHand();
+        }
+        //reset compteurs
+        numberOfActions=0;
+        numberOfBuys=0;
+        money=0;
     }
 
     /**
@@ -530,7 +593,8 @@ public class Player {
      * Les compteurs de nombre d'actions, de nombre d'achats et argent sont initialisés
      */
     public void startTurn() {
-        throw new RuntimeException("Not Implemented");
+        numberOfBuys=1;
+        numberOfActions=1;
     }
 
     /**

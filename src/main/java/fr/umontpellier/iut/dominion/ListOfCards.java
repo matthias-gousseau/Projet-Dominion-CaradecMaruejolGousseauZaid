@@ -42,7 +42,11 @@ public class ListOfCards extends ArrayList<Card> {
      * @return la carte retirée si elle a été trouvée, {@code null} sinon
      */
     public Card remove(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        Card c=this.getCard(cardName);
+        if (c!=null){
+            this.remove(c);
+        }
+        return c;
     }
 
     /**
@@ -53,7 +57,15 @@ public class ListOfCards extends ArrayList<Card> {
      * {@code null} sinon
      */
     public Card getCard(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        int i;
+        Card carte = null; //On met la valeur à null dans le cas où on trouverai pas la carte
+        for(i=0;i<this.size();i++){
+            if(this.get(i).getName() == cardName){ //On test voir si la carte à le même nom que celui donné
+                carte = this.get(i);
+                i = this.size(); //Pour sortir de la boucle
+            }
+        }
+        return carte;
     }
 
     /**

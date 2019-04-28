@@ -44,14 +44,14 @@ class GameTest {
         assertEquals("Titi", p.getName());
     }
 
-    @Disabled
+    /*@Disabled*/
     @Test
     void testOtherPlayersSize() {
         Player p = minimalGame.getPlayer(1);
         assertEquals(2, minimalGame.otherPlayers(p).size());
     }
 
-    @Disabled
+    /*@Disabled*/
     @Test
     void testOtherPlayersNames() {
         Player p = minimalGame.getPlayer(1);

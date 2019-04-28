@@ -119,7 +119,16 @@ public class Game {
      * premier).
      */
     public List<Player> otherPlayers(Player p) {
-        throw new RuntimeException("Not Implemented");
+        List<Player> other= new ArrayList<Player>();
+        for (int i = players.indexOf(p)+1; i < players.size() ; i++) {
+//liste des joueurs après le player p
+            other.add(players.get(i));
+        }
+        for (int i = 0; i < players.indexOf(p); i++) {
+//liste des joueurs avant player p
+            other.add(players.get(i));
+        }
+        return other;
     }
 
     /**
@@ -130,8 +139,15 @@ public class Game {
      * non-vide de la réserve (cartes royaume et cartes communes)
      */
     public ListOfCards availableSupplyCards() {
-        throw new RuntimeException("Not Implemented");
+        ArrayList<Card> available= new ArrayList<Card>();
+        for (int i = 0; i <supplyStacks.size() ; i++) {//parcour tout les supply stacks
+            if (!supplyStacks.get(i).isEmpty()){//regarde si ce supply stack est non vide.
+                available.add(supplyStacks.get(i).get(0)); //ajoute la carte à la liste available
+            }
+        }
+        return new ListOfCards(available);
     }
+
 
     /**
      * Renvoie une représentation de l'état de la partie sous forme d'une chaîne
@@ -201,7 +217,20 @@ public class Game {
      * ne correspond
      */
     public Card getFromSupply(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        Card c= null;
+        boolean trouve=false;
+        int i=0;
+//parcourt partiel
+        while (i<supplyStacks.size() && !trouve){
+            if (supplyStacks.get(i).getCard(cardName)!= null){
+//on regarde si la listOfCard dans supplystack possède la carte et si oui :
+                trouve=true;
+                c=supplyStacks.get(i).getCard(cardName);
+            }
+            i++;
+//sinon c reste = à null
+        }
+        return c;
     }
 
     /**
@@ -212,7 +241,17 @@ public class Game {
      * ne correspond au nom passé en argument
      */
     public Card removeFromSupply(String cardName) {
-        throw new RuntimeException("Not Implemented");
+        Card c= null;
+        boolean trouve=false; // pareil que le précédent sauf qu'au lieu de getCard la seconde fois on la remove poru l'avoir et la supprimer
+        int i=0;
+        while (i<supplyStacks.size() && !trouve){
+            if (supplyStacks.get(i).getCard(cardName)!= null){
+                trouve=true;
+                c=supplyStacks.get(i).remove(cardName);
+            }
+            i++;
+        }
+        return c;
     }
 
     /**
